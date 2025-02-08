@@ -1,70 +1,101 @@
-const questions = [
-    {
-        question: "What is a promise?",
-        options: ["A commitment", "A gift", "A secret", "A secret gesture"],
-        answer: 0
-    },
-    {
-        question: "When do you break a promise?",
-        options: ["Never", "When it's too difficult", "When you forget", "When you’re bored"],
-        answer: 0
-    },
-    {
-        question: "A promise shows?",
-        options: ["Trust", "Respect", "Love", "All of the above"],
-        answer: 3
-    },
-    {
-        question: "Which of these is NOT a promise?",
-        options: ["I’ll try", "I will", "I might", "I promise"],
-        answer: 2
-    }
+const gameBoard = document.getElementById("game-board");
+const timerDisplay = document.getElementById("timer");
+const scoreDisplay = document.getElementById("score");
+
+let cards = [
+    "❤️", "❤️", "🤞", "🤞", "💍", "💍", "🎁", "🎁",
+    "💕", "💕", "💖", "💖", "💌", "💌", "🌹", "🌹"
 ];
 
-let currentQuestion = 0;
+let shuffledCards = [];
+let firstCard = null;
+let secondCard = null;
+let canFlip = true;
 let score = 0;
+let timeLeft = 60;
+let timer;
 
-function loadQuestion() {
-    if (currentQuestion < questions.length) {
-        const question = questions[currentQuestion];
-        document.getElementById("question").textContent = question.question;
-        const buttons = document.querySelectorAll(".answer-btn");
-        question.options.forEach((option, index) => {
-            buttons[index].textContent = option;
-        });
-    } else {
-        showFinalScore();
+function shuffleCards() {
+    shuffledCards = [...cards].sort(() => Math.random() - 0.5);
+}
+
+function createBoard() {
+    gameBoard.innerHTML = "";
+    shuffledCards.forEach((emoji, index) => {
+        const card = document.createElement("div");
+        card.classList.add("card");
+        card.dataset.index = index;
+        card.innerText = "❓";
+        card.addEventListener("click", () => flipCard(card, emoji));
+        gameBoard.appendChild(card);
+    });
+}
+
+function flipCard(card, emoji) {
+    if (!canFlip || card.classList.contains("matched")) return;
+
+    card.innerText = emoji;
+
+    if (!firstCard) {
+        firstCard = { card, emoji };
+    } else if (!secondCard) {
+        secondCard = { card, emoji };
+        canFlip = false;
+
+        setTimeout(checkMatch, 800);
     }
 }
 
-function checkAnswer(selectedIndex) {
-    const correctAnswer = questions[currentQuestion].answer;
-    if (selectedIndex === correctAnswer) {
-        score++;
-    }
-    currentQuestion++;
-    if (currentQuestion < questions.length) {
-        loadQuestion();
+function checkMatch() {
+    if (firstCard.emoji === secondCard.emoji) {
+        firstCard.card.classList.add("matched");
+        secondCard.card.classList.add("matched");
+        score += 10;
+        scoreDisplay.innerText = score;
     } else {
-        showFinalScore();
+        firstCard.card.innerText = "❓";
+        secondCard.card.innerText = "❓";
+    }
+
+    firstCard = null;
+    secondCard = null;
+    canFlip = true;
+
+    if (document.querySelectorAll(".matched").length === cards.length) {
+        clearInterval(timer);
+        alert("Congratulations! You've matched all promises!");
     }
 }
 
-function showFinalScore() {
-    document.querySelector(".question-container").classList.add("hidden");
-    const scoreContainer = document.getElementById("score-container");
-    scoreContainer.classList.remove("hidden");
-    document.getElementById("score").textContent = score;
+function startTimer() {
+    timer = setInterval(() => {
+        timeLeft--;
+        timerDisplay.innerText = timeLeft;
 
-    let finalMessage = '';
-    if (score === questions.length) {
-        finalMessage = "You're a Promise Day Pro! I loveeee youuuuu 💖";
-    } else if (score >= questions.length / 2) {
-        finalMessage = "Great! You understand the essence of promises. I loveeeeeeee youuuuuuuuuu 💝";
-    } else {
-        finalMessage = "You might need to work on your promises. Don’t worry, you’ll get there! I loveeeeeeeee youuuuuuuuuuuuuuuu 💗";
-    }
-    document.getElementById("final-message").textContent = finalMessage;
+        if (timeLeft === 0) {
+            clearInterval(timer);
+            alert("Time's up! Try again.");
+            restartGame();
+        }
+    }, 1000);
 }
 
-loadQuestion();
+function restartGame() {
+    clearInterval(timer);
+    timeLeft = 60;
+    score = 0;
+    timerDisplay.innerText = timeLeft;
+    scoreDisplay.innerText = score;
+    firstCard = null;
+    secondCard = null;
+    canFlip = true;
+
+    shuffleCards();
+    createBoard();
+    startTimer();
+}
+
+// Initialize game
+shuffleCards();
+createBoard();
+startTimer();
