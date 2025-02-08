@@ -3,26 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Promise Day Quiz Game</title>
-    <link rel="stylesheet" href="promise.css">
+    <title>Promise Day - Memory Match Game</title>
+    <link rel="stylesheet" href="promise-day.css">
 </head>
 <body>
     <div class="game-container">
-        <h1>Promise Day Quiz!</h1>
-        <div class="question-container">
-            <p id="question"></p>
-            <div class="answers">
-                <button class="answer-btn" onclick="checkAnswer(0)"></button>
-                <button class="answer-btn" onclick="checkAnswer(1)"></button>
-                <button class="answer-btn" onclick="checkAnswer(2)"></button>
-                <button class="answer-btn" onclick="checkAnswer(3)"></button>
-            </div>
-        </div>
-        <div id="score-container" class="hidden">
-            <h2>Your Promise Day Score: <span id="score"></span></h2>
-            <p id="final-message"></p>
-        </div>
+        <h1>💖 Promise Matcher 💖</h1>
+        <p>Match the promises to prove your love!</p>
+        <div id="game-board"></div>
+        <p class="status">Time Left: <span id="timer">60</span> sec</p>
+        <p class="status">Score: <span id="score">0</span></p>
+        <button onclick="restartGame()">Restart</button>
     </div>
-    <script src="promise.js"></script>
+    <script src="promise-day.js"></script>
 </body>
 </html>
