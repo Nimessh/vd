@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Love Quest: Proposal Game</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #ffedee 0%, #ffd8df 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .game-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 30px;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .game-title {
+            color: #ff4b6e;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .clue-container {
+            margin: 20px 0;
+            padding: 20px;
+            background: #fff5f6;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .clue-text {
+            font-size: 18px;
+            line-height: 1.6;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .input-container {
+            margin: 20px 0;
+        }
+
+        .tip-text {
+            font-size: 14px;
+            color: #666;
+            margin: 10px 0;
+            font-style: italic;
+        }
+
+        input {
+            padding: 10px 15px;
+            border: 2px solid #ffd8df;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 300px;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        button {
+            background: #ff4b6e;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+        }
+
+        button:hover {
+            background: #ff3358;
+            transform: translateY(-2px);
+        }
+
+        .hearts {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .heart {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #ff4b6e;
+            transform: rotate(45deg);
+            opacity: 0;
+        }
+
+        .heart::before,
+        .heart::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #ff4b6e;
+        }
+
+        .heart::before {
+            left: -10px;
+        }
+
+        .heart::after {
+            top: -10px;
+        }
+
+        .final-message {
+            display: none;
+            animation: fadeIn 1s ease-in;
+            padding: 20px;
+        }
+
+        .proposal-text {
+            font-size: 16px;
+            line-height: 1.8;
+            color: #333;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #ffd8df;
+            border-radius: 5px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress {
+            width: 0%;
+            height: 100%;
+            background: #ff4b6e;
+            transition: width 0.5s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="hearts"></div>
+    <div class="game-container">
+        <h1 class="game-title">💝 Love Quest: A Journey to Forever 💝</h1>
+        <div class="progress-bar">
+            <div class="progress"></div>
+        </div>
+        <div class="clue-container" id="current-clue">
+            <p class="clue-text"></p>
+            <div class="input-container">
+                <input type="text" id="answer-input" placeholder="Enter your answer...">
+                <p class="tip-text">Tip: First letter should be capital, no repeated letters (e.g., 'your' not 'yourrrr')</p>
+                <button onclick="checkAnswer()">Submit Answer</button>
+            </div>
+        </div>
+        <div class="final-message">
+            <h2>My Dearest Love ❤️</h2>
+            <div class="proposal-text">
+                <p>From our first meeting in the canteen to our magical moments at Kamalpokhari, every second with you has been a blessing. Our dance at Garden of Dreams and the way you make my heart skip a beat when you call me Nimshuuu - these memories are treasures I'll hold forever.</p>
+                <p>You're already my girlfriend, my best friend, and my soulmate. But I want more - I want forever with you. I want to wake up to your smile every morning, share all of life's adventures, and grow old holding your hand.</p>
+                <p>You make me a better person. Your love gives me strength, your smile lights up my darkest days, and your heart completes mine in ways I never thought possible.</p>
+                <p>So today, I'm asking you to take this next step with me...</p>
+            </div>
+            <h2>Will you marry me? 💍</h2>
+            <p style="margin: 20px 0;">Let's write our forever story together...</p>
+            <button onclick="createHeartShower()">Yes! 💝</button>
+        </div>
+    </div>
+
+    <script>
+        const clues = [
+            {
+                text: "Our story began in a special place,\nWhere first our eyes met face to face.\nThe location's name starts with the letter that's third,\nIn the alphabet we learned word by word.",
+                answer: "Canteen"
+            },
+            {
+                text: "By the fountain's playful spray,\nMy courage finally found its way,\nTo place a gentle kiss so sweet,\nUpon your cheeks, my heart's first beat.(Guess the location)",
+                answer: "Kamalpokhari"
+            },
+            {
+                text: "Music filled the air that special night,\nWhen we danced under crystal light.\nThis venue's name brings memories sweet,\nWhere rhythm moved our dancing feet.",
+                answer: "Garden of Dreams"
+            },
+            {
+                text: "Text messages lit up my screen,\nNimshuuu made me smile, unseen.\nEach letter typed with loving care,\nMaking distance fade to air(write your nickname, that I call you by)",
+                answer: "Chandu"
+            }
+        ];
+
+        let currentClueIndex = 0;
+        const clueContainer = document.getElementById('current-clue');
+        const finalMessage = document.querySelector('.final-message');
+        const progressBar = document.querySelector('.progress');
+
+        function showCurrentClue() {
+            clueContainer.style.display = 'block';
+            document.querySelector('.clue-text').textContent = clues[currentClueIndex].text;
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const progress = ((currentClueIndex) / clues.length) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+
+        function checkAnswer() {
+            const input = document.getElementById('answer-input');
+            const userAnswer = input.value.trim();
+            const correctAnswer = clues[currentClueIndex].answer;
+            
+            if (userAnswer === correctAnswer) {
+                input.value = '';
+                currentClueIndex++;
+                
+                if (currentClueIndex < clues.length) {
+                    showCurrentClue();
+                    createHearts(5);
+                } else {
+                    clueContainer.style.display = 'none';
+                    finalMessage.style.display = 'block';
+                    progressBar.style.width = '100%';
+                    createHearts(20);
+                }
+            } else {
+                input.style.border = '2px solid red';
+                setTimeout(() => {
+                    input.style.border = '2px solid #ffd8df';
+                }, 1000);
+            }
+        }
+
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.classList.add('heart');
+            
+            const startX = Math.random() * window.innerWidth;
+            const startY = window.innerHeight;
+            
+            heart.style.left = startX + 'px';
+            heart.style.top = startY + 'px';
+            
+            document.querySelector('.hearts').appendChild(heart);
+            
+            const animation = heart.animate([
+                { transform: `translate(0, 0) rotate(45deg)`, opacity: 1 },
+                { transform: `translate(${Math.random() * 100 - 50}px, -${window.innerHeight}px) rotate(${45 + Math.random() * 90}deg)`, opacity: 0 }
+            ], {
+                duration: 3000,
+                easing: 'ease-out'
+            });
+            
+            animation.onfinish = () => heart.remove();
+        }
+
+        function createHearts(count) {
+            for (let i = 0; i < count; i++) {
+                setTimeout(createHeart, i * 100);
+            }
+        }
+
+        function createHeartShower() {
+            setInterval(() => createHearts(3), 500);
+        }
+
+        // Start the game
+        showCurrentClue();
+    </script>
+</body>
+</html>
